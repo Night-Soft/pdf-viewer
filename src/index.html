@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Отправка запроса к Express.js</title>
+</head>
+<body>
+  <button onclick="getFirstPage()">Получить данные с сервера</button>
+  <button onclick="previousPage()">previsous page</button>
+  <input id="CurrentPage" type="number" value="1" min="1" max="100" />
+
+  <button onclick="nextPge()">Next page</button>
+
+  <!-- <p id="response"></p> -->
+  <div id="pdfContainer">
+    <canvas id="pdfViewer"></canvas>
+  </div>
+  <script>
+//     async function getData() {
+//       try {
+//         const response = await fetch('/api/data');
+//         const data = await response.text();
+//         // document.getElementById('response').textContent = data.message;
+
+//       const container = document.getElementById('pdfContainer');
+//       const canvas = document.getElementById('pdfViewer');
+//       const ctx = canvas.getContext("2d");
+//       const dataURL = data;
+
+// const img = new Image();
+// img.onload = function() {
+//     // Step 3: Once the image is loaded, create a new canvas with the same dimensions
+//     //const canvas = document.createElement('canvas');
+//     canvas.width = img.width;
+//     canvas.height = img.height;
+
+//     // Step 4: Draw the image on the canvas
+//     const ctx = canvas.getContext('2d');
+//     ctx.drawImage(img, 0, 0);
+
+//     // Now you can use the 'canvas' element, which contains the image from the data URL.
+//     // For example, you can append it to the DOM or do any other manipulation.
+
+//     // Example: Append the canvas to the body
+//     //document.body.appendChild(canvas);
+// };
+// img.src = dataURL;
+//       } catch (error) {
+//         console.error('Ошибка при получении данных:', error);
+//       }
+//     }
+  </script>
+
+</body>
+<script src="./script.js" type="text/javascript"></script>
+
+</html>
