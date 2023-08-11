@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Pdf viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="#" />
+  <link rel="stylesheet" href="/web/style/style.css">
+  <link rel="stylesheet" href="/web/style/input-nuber.css">
+</head>
+
+<body>
+  <div class="modal">
+    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+  </div>
+
+  <div id="pdfContainer" class="pdf-container">
+    <div class="backround-image"></div>
+    <canvas id="pdfViewer"></canvas>
+    <div class="control-container">
+      <input class="slider" type="range" min="1" max="100" value="50">
+      <div class="control-button">
+        <!-- <button class="buttons" onclick="getPdfDocument()">GetDocument</button> -->
+        <div class="buttons previous-btn" onclick="previousPage()"></div>
+        <!-- <input id="CurrentPage" type="number" value="1" min="1" max="100" /> -->
+        <div class="input-number-container">
+          <div class="input-container">
+          <input id="CurrentPage" type="number" type="range" min="1" max="1" value="50" class="input-number-custom">
+          <!-- <span>/</span>
+          <span id="PageCount">1</span> -->
+          </div>
+
+          <div class="control-input-content">
+              <div class="inner-spin-button">
+                  <div class="spin spin-up"></div>
+                  <div class="spin spin-down"></div>
+              </div>
+              <div class="ok-btn">
+                <span class="ok-btn-span">OK</span>
+                <div class="lds-ellipsis lds-ellipsis-ok-btn "><div></div><div></div><div></div><div></div></div>
+              </div>
+          </div>
+      </div>
+        <div class="buttons next-btn" onclick="nextPge()"></div>
+        <div class="buttons fullscreen-btn" id="FullScreenBtn"></div>
+      </div>
+      <button class="test-btn-text">Test</button>
+    </div>
+  </div>
+</body>
+<script src="/web/js/official.js" type="text/javascript"></script>
+<script src="/web/js/script.js" type="text/javascript"></script>
+
+</html>

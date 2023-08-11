@@ -1,0 +1,204 @@
+.modal {
+    display: none;
+    background-color: hwb(0 0% 100% / 0.5);
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+}
+
+.pdf-container {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  min-width: 600px;
+  min-height: 400px;
+  height: calc(100vh - 16px);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  justify-content: space-between;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgb(52 52 52 / 5%) 0%, rgba(52, 52, 52, 0.15) 100%);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+#pdfViewer {
+  visibility: hidden;
+  align-self: center;
+  box-shadow: 0px 0px 8px 1px rgb(0 0 0 / 25%);
+}
+/* #CurrentPage {
+  background: none;
+  color: white;
+  font-size: 24px;
+  text-align: center;
+  width: 120px;
+  border-style: none;
+} */
+.control-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 70px;
+  width: 100%;
+  position: relative;
+  background: rgb(155 155 155 / 35%);
+  backdrop-filter: blur(5px);
+}
+.backround-image {
+  filter: blur(10px);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: -1;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  transition: 1s;
+}
+.control-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  position: relative;
+  max-width: 600px;
+  width: 100%;
+  align-self: center;
+  padding: 5px;
+}
+.buttons {
+  background-size: 24px;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+.buttons:hover {
+  background-color: rgb(255 255 255 / 25%);
+}
+.buttons:active {
+  background-color:  rgba(255, 255, 255, 0.45);
+}
+.next-btn {
+  background-image: url(../img/next.svg);
+}
+.previous-btn {
+  background-image: url(../img/previous.svg);
+}
+.fullscreen-btn {
+  background-image: url(../img/fullscreen.svg);
+}
+
+.document-loaded {
+	-webkit-animation: document-loaded 0.7s;
+	        animation: document-loaded 0.7s;
+}
+
+.document-loading {
+	-webkit-animation: document-loaded reverse 0.7s;
+	        animation: document-loaded reverse 0.7s;
+}
+.test-btn-text {
+  position: absolute;
+  height: 14px;
+  right: 0px;
+  top: 56px;
+  border: none;
+  border-top-left-radius: 16px;
+  color: white;
+  background: rgb(143 143 143 / 60%);
+  cursor: pointer;
+}
+@-webkit-keyframes document-loaded {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+  }
+  @keyframes document-loaded {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+  }
+
+  .lds-ellipsis {
+    align-self: center;
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    transform: scale(2);
+  }
+  .lds-ellipsis-ok-btn {
+    display: none;
+    width: 40px;
+    transform: scale(0.5);
+    left: -12px;
+  }
+  .lds-ellipsis div {
+    position: absolute;
+    top: 33px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #fff;
+    animation-timing-function: cubic-bezier(0, 1, 1, 0);
+  }
+  .lds-ellipsis div:nth-child(1) {
+    left: 8px;
+    animation: lds-ellipsis1 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(2) {
+    left: 8px;
+    animation: lds-ellipsis2 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(3) {
+    left: 32px;
+    animation: lds-ellipsis2 0.6s infinite;
+  }
+  .lds-ellipsis div:nth-child(4) {
+    left: 56px;
+    animation: lds-ellipsis3 0.6s infinite;
+  }
+  @keyframes lds-ellipsis1 {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes lds-ellipsis3 {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
+  @keyframes lds-ellipsis2 {
+    0% {
+      transform: translate(0, 0);
+    }
+    100% {
+      transform: translate(24px, 0);
+    }
+  }
+  
