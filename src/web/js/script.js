@@ -9,57 +9,88 @@ const okBtn = document.getElementsByClassName('ok-btn')[0];
 const controlContainer = document.getElementsByClassName('control-container')[0];
 const slider = document.getElementsByClassName('slider')[0];
 const testBtn = document.querySelectorAll(".test-btn-text")[0];
+const pageContent = document.getElementsByClassName("page-content")[0];
 
-const pdfState = {
-  get pageCount() {
-    return parseInt(currentPage.getAttribute('max'));
+const pdfState = Object.create({}, {
+  pageCount: {
+    get() {
+      return parseInt(currentPage.getAttribute('max'));
+    },
+    set(value) {
+      value = parseInt(value);
+      if (value < this.pageNumber) {
+        this.pageNumber = value;
+      }
+      currentPage.setAttribute('max', value);
+      slider.setAttribute('max', value);
+    },
   },
-  set pageCount(value) {
-    value = parseInt(value);
-    if (value < this.pageNumber) {
-      this.pageNumber = value;
-    }
-    currentPage.setAttribute('max', value);
-    slider.setAttribute('max', value);
+  _pageNumber: {
+    value: 1,
+    enumerable: false,
+    writable: true
   },
-  _pageNumber: 1,
-  get pageNumber() {
-    return this._pageNumber;
-  },
-  set pageNumber(value) {
-    value = parseInt(value);
-    if (value < 1) {
-      this._pageNumber = 1;
-      currentPage.value = this._pageNumber;
-      slider.value = this._pageNumber;
-    } else {
-      if (value > this.pageCount) {
-        this._pageNumber = this.pageCount;
+  pageNumber: {
+    get() {
+      return this._pageNumber;
+    },
+    set(value) {
+      value = parseInt(value);
+      if (value < 1) {
+        this._pageNumber = 1;
+        currentPage.value = this._pageNumber;
+        slider.value = this._pageNumber;
+      } else {
+        if (value > this.pageCount) {
+          this._pageNumber = this.pageCount;
+          currentPage.value = this._pageNumber;
+          slider.value = this._pageNumber;
+        }
+        this._pageNumber = value;
         currentPage.value = this._pageNumber;
         slider.value = this._pageNumber;
       }
-      this._pageNumber = value;
-      currentPage.value = this._pageNumber;
-      slider.value = this._pageNumber;
-    }
+    },
   },
-};
+  _expectedPage: {
+    value: 1,
+    enumerable: false,
+    writable: true
+  },
+  expectedPage: {
+    get() {
+      return this._expectedPage;
+    },
+    set(value) {
+      if (!isNaN(value)) {
+        console.log("set _expectedPage");
+        this._expectedPage = value;
+      }
+    }
 
+  }
+
+});
+
+
+
+const delayGetPage = new DelayLastEvent({delay: 500}); // this How
 // eslint-disable-next-line no-unused-vars
 const previousPage = () => {
   if (currentPage.value == 1) return;
-  getPage({currentPage: parseInt(currentPage.value) - 1});
+  getPage({ currentPage: parseInt(currentPage.value) - 1 });
+
 };
 
 // eslint-disable-next-line no-unused-vars
-const nextPge = () => {
+const nextPage = () => {
   if (currentPage.value == pdfState.pageCount) return;
-  getPage({currentPage: parseInt(currentPage.value) + 1});
+  getPage({ currentPage: parseInt(currentPage.value) + 1 });
+
 };
 
 let pageList = {
   /**
- * Represents a book.
  * @param {key} number - The number of the page.
  * @param {string} image - The Base64 URL.
  * @param {number} width - The width of the image.
@@ -104,8 +135,16 @@ let pageList = {
     this.numbers.length = 0;
   },
   numbers: []
-
 }
+
+Object.defineProperties(pageList, {
+  get: { enumerable: false },
+  set: { enumerable: false },
+  show: { enumerable: false },
+  clear: { enumerable: false },
+  _numbers: { enumerable: false },
+  numbers: { enumerable: false },
+});
 
 pageList = new Proxy(pageList, {
   set(target, key, {image, width, height}, receiver) {
@@ -115,34 +154,32 @@ pageList = new Proxy(pageList, {
       width: width,
       height: height
     }
-    target.numbers.push(Number(key));
+    if (target.numbers.indexOf(Number(key)) == -1) {
+      target.numbers.push(Number(key));    
+    }
     return Reflect.set(target, key, obj, receiver);
   },
 });
 
-//pageList.set("b", "url", 100, 200);
-pageList.set("300", "url", 100, 200);
-
-console.log(pageList.get("b"));
-
-const spinDelay = new DelayLastEvent({delay: 4500});
 
 testBtn.addEventListener("click", ()=>{
 console.log("testBtn click");
 getPdfDocument();
 });
 
+const spinDelay = new DelayLastEvent({delay: 4500});
+
 spinUp.onclick = () => {
   if (currentPage.value == pdfState.pageCount) return;
   currentPage.value++;
-  spinDelay.exec(()=>{
+  spinDelay.run(()=>{
     currentPage.value = pdfState.pageNumber;
   }, 5000);
 };
 spinDown.onclick = () => {
   if (currentPage.value == 1) return;
   currentPage.value--;
-  spinDelay.exec(()=>{
+  spinDelay.run(()=>{
     currentPage.value = pdfState.pageNumber;
   }, 5000);
 };
@@ -188,7 +225,7 @@ fullScreenBtn.onclick = () => {
         const scale = pdfContainer.offsetHeight / canvasState.height;
         const size = {
           width: pdfContainer.offsetWidth, //parseFloat((canvasState.width * scale).toFixed(4)),
-          height: pdfContainer.offsetHeight,
+          height: pdfContainer.offsetHeight - 70,
         };
         console.log(size);
         // drawPage(imageSrc, size);
@@ -215,7 +252,7 @@ fullScreenBtn.onclick = () => {
         const scale = pdfContainer.offsetHeight / canvasState.height;
         const size = {
           width: pdfContainer.offsetWidth, //parseFloat((canvasState.width * scale).toFixed(4)),
-          height: pdfContainer.offsetHeight,
+          height: pdfContainer.offsetHeight - 70,
         };
         console.log(size);
         // drawPage(imageSrc, size);
@@ -326,10 +363,14 @@ const getPage = async options => {
   console.log(options)
   if (options.currentPage) {
       let { currentPage } = options;
+      pdfState.expectedPage = currentPage;
       if (pageList.get(currentPage) != undefined) {
           console.log(`Page ${currentPage} draw from memory`);
           drawPage(pageList.get(currentPage));
+          preparePages()
           return;
+      } else {
+      modal.toggle(true)
       }
   }
 
@@ -342,63 +383,98 @@ const getPage = async options => {
       },
       body: JSON.stringify(options)
   }
+  const result = await sendRequest({ requestIfo, requestInit });
+  if (result.page) {
+    const {image,width,height} = result.page;
+    pageList.set(result.currentPage, 'data:image/jpeg;base64,' + image, width, height);
+    drawPage(pageList.get(result.currentPage));
+    modal.toggle(false)
+  }
+  if (result.pageCount) {
+    pdfState.pageCount = result.pageCount;
+    console.log('page count set getPage', result.pageCount);
+  }
+  if (result.currentPage) {
+    pdfState.pageNumber = result.currentPage;
+    preparePages()
+    console.log('current page set', pdfState.pageNumber);
+  }
 
-  sendRequest({ requestIfo, requestInit })
-      .then((result) => {
-          console.log("result new", result);
-          if (result.page) {
-              canvas.style.visibility = 'visible';
-              pageList.set(result.currentPage, 'data:image/jpeg;base64,' + result.page);
-              drawPage(pageList.get(result.currentPage));
-              // modal.toggle(false)
-          }
-          if (result.currentPage) {
-              pdfState.pageNumber = result.currentPage;
-              console.log('current page set', pdfState.pageNumber);
-          }
-          if (result.pageCount) {
-              pdfState.pageCount = result.pageCount;
-              console.log('page count set getPage', result.pageCount);
-          }
-          testBtn.innerHTML = `Load: ${(window.performance.now() - start).toFixed(3)} ms. Render: ${result.renderTime} ms.`
-          return new Promise((resolve) => { resolve(result); });
-      }, (reject) => {
-          console.warn(reject)
-      });
+  testBtn.innerHTML = `Load: ${(window.performance.now() - start).toFixed(3)} ms. Render: ${result.renderTime} ms.`
+  
+  return new Promise((resolve, reject) => {
+    resolve(result);
+  });
 }
 
+const userId = Date.now().toString();
 const getPdfDocument = async (fileName = "sea.pdf") => {
   const start = window.performance.now();
   if (typeof fileName == 'string') {
-      fileName = { document: fileName };
+    fileName = { document: fileName }; /// this
   }
-  fileName.width = pdfContainer.offsetWidth;
-  fileName.height = pdfContainer.offsetHeight - controlContainer.offsetHeight;
+
   modal.toggle(true);
+  const requestIfo = {
+    document: fileName.document,
+    width: 800,//pdfContainer.offsetWidth,
+    height: 800,//pdfContainer.offsetHeight - controlContainer.offsetHeight,
+    userId: userId,
+  }
+  const result = await sendRequest({ requestIfo: `/api/data?${new URLSearchParams(requestIfo)}` });
   
-  sendRequest({requestIfo: `/api/data?${new URLSearchParams(fileName)}`})
-      .then((result) => {
-          pageList.clear();
-          console.log("result new pdf", result);
-          if (result.pageCount) {
-              pdfState.pageCount = result.pageCount;
-              console.log('page count set GetPdf', result.pageCount);
-          }
-          canvas.style.visibility = 'visible';
-          pageList.set(1, 'data:image/jpeg;base64,' + result.page);
-          drawPage(pageList.get(1));
-          pdfState.pageNumber = 1;
-          modal.toggle(false);
-          console.log('modal toggled to false');
-          testBtn.innerHTML = `Load: ${(window.performance.now() - start).toFixed(3)} ms. Render: ${result.renderTime} ms.`
-          return new Promise((resolve) => { resolve(result); });
-      });
+  console.log(`The '${fileName.document}' is loaded in ${(window.performance.now() - start).toFixed(3)} ms.`);
+  
+  const {pageCount,renderTime} = result;
+  const {image,width,height} = result.page;
+  
+  if (pageCount) {
+    pdfState.pageCount = pageCount;
+  }
+  pageList.clear();
+  pageList.set(1, 'data:image/jpeg;base64,' + image, width, height);
+  pdfState.expectedPage = 1;
+  drawPage(pageList.get(1));
+  pdfState.pageNumber = 1;
+  
+  preparePages();
+
+  modal.toggle(false);
+  testBtn.innerHTML = `Load: ${(window.performance.now() - start).toFixed(3)} ms. Render: ${renderTime} ms.`;
+
+  return Promise.resolve(result);
 }
-getPage({checkRend: true});
+
+getPage({ checkRend: true }).then((result) => {
+  if (result.currentPage) {
+    pdfState.expectedPage = result.currentPage;
+    drawPage(pageList.get(result.currentPage));
+  }
+});
+
+
+  /**
+ * @param {number} countPages - Number of pages to render.
+ */
+function preparePages(countPages = 7) {
+  const wsMessage = {
+    preparePages: true,
+    size: {
+      width: pdfContainer.offsetWidth,
+      height: pdfContainer.offsetHeight - controlContainer.offsetHeight,
+    },
+    pages: uniquePages(getPageNumbers(pdfState.pageNumber, countPages, pdfState.pageCount), pageList.numbers)
+  }
+  if (wsMessage.pages.length > 0) {
+    console.log("wsMessage GetPage", wsMessage);
+    sendWSMessage(wsMessage);
+  }
+}
+
 
 const container = document.getElementById('pdfContainer');
 const canvas = document.getElementById('pdfViewer');
-const ctx = canvas.getContext('2d');
+// const ctx = canvas.getContext('2d');
 const canvasState = {
   pages: {
     '1': {
@@ -425,35 +501,62 @@ const canvasState = {
     // canvas.height = value - controlContainer.offsetHeight;
   },
 };
+
 const drawPage = (data, size, clear) => {
-  const img = new Image();
-  img.onload = function() {
-    console.log(img.width, img.height);
-    // if(size) {
-    //     canvasState.width = size.width;
-    //     canvasState.height = size.height;
-    // ctx.drawImage(img, 0, 0, size.width, size.height);
+  //console.log(data)
+  // const img = new Image();
+  // img.onload = function() {
+  //   console.log(img.width, img.height);
+  //   // if(size) {
+  //   //     canvasState.width = size.width;
+  //   //     canvasState.height = size.height;
+  //   // ctx.drawImage(img, 0, 0, size.width, size.height);
 
-    // } else {
-    // //canvasState.width = img.width;
-    // //canvasState.height = img.height;
+  //   // } else {
+  //   // //canvasState.width = img.width;
+  //   // //canvasState.height = img.height;
 
-    // }
+  //   // }
 
-    canvas.width = img.width;
-    canvas.height = pdfContainer.offsetHeight - controlContainer.offsetHeight;
-    canvas.style.height = pdfContainer.offsetHeight - controlContainer.offsetHeight + 'px';
-    canvas.style.width = img.width + 'px';
-    ctx.drawImage(img, 0, 0, img.width, img.height);
+  //   canvas.width = img.width;
+  //   canvas.height = pdfContainer.offsetHeight - controlContainer.offsetHeight;
+  //   canvas.style.height = pdfContainer.offsetHeight - controlContainer.offsetHeight + 'px';
+  //   canvas.style.width = img.width + 'px';
+  //   ctx.drawImage(img, 0, 0, img.width, img.height);
 
 
-    // ctx.drawImage(img, 0, 0, size.width, size.height);
-  };
-  img.src = data.image;
-  backgroundImage.style.backgroundImage = `url(${data.image})`;
+  //   // ctx.drawImage(img, 0, 0, size.width, size.height);
+  // };
+  // img.src = data.image;
+  if (data.number == pdfState.expectedPage) {
+    fetch(data.image)
+    .then(response => response.blob())
+    .then((result) => {
+      const url = URL.createObjectURL(result)
+      backgroundImage.style.backgroundImage = `url(${url})`;
+    });
   pdfState.pageNumber = data.number;
+  }
+
+  //pageZoom.clear();
 };
 
 // getPdfDocument("1.pdf")
 
 
+const getImageSize = async (imageUrl) => {
+  const start = window.performance.now();
+  const img = new Image();
+  return new Promise((resolve, reject) => {
+    img.onload = function () {
+      //console.log(img.width, img.height)
+      resolve({
+        width: img.width,
+        height: img.height,
+        loadIn: (window.performance.now() - start).toFixed(3)
+      });
+    };
+    img.src = imageUrl;
+  });
+}
+//const pageZoom= new ZoomElement(pageContent)

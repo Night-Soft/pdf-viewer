@@ -11,13 +11,31 @@
 </head>
 
 <body>
-  <div class="modal">
-    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
-  </div>
-
   <div id="pdfContainer" class="pdf-container">
     <div class="backround-image"></div>
-    <canvas id="pdfViewer"></canvas>
+    <!-- <canvas id="pdfViewer"></canvas> -->
+    <div class="page-spread">
+      <div class="page-content">
+        <div class="left">
+          <div class="page page--2">Age 2</div>
+          <div class="page page--1">Age 1</div>
+        </div>
+        <div class="right">
+          <div class="page page--3">Age 3</div>
+          <div class="page page--4">Age 4</div>
+        </div>
+      </div>
+      <div id="HiddenPages" class="page-content hidden">
+        <div class="left">
+          <div style="background-color: blue;" class="page page--2">Age 6</div>
+          <div style="background-color: purple;" class="page page--1">Age 5</div>
+        </div>
+        <div class="right">
+          <div style="background-color: orangered;" class="page page--3">Age 7</div>
+          <div style="background-color: gray;" class="page page--4">Age 8</div>
+        </div>
+      </div>
+    </div>
     <div class="control-container">
       <input class="slider" type="range" min="1" max="100" value="50">
       <div class="control-button">
@@ -42,14 +60,21 @@
               </div>
           </div>
       </div>
-        <div class="buttons next-btn" onclick="nextPge()"></div>
+        <div class="buttons next-btn" onclick="nextPage()"></div>
         <div class="buttons fullscreen-btn" id="FullScreenBtn"></div>
       </div>
       <button class="test-btn-text">Test</button>
     </div>
   </div>
+  <div class="modal">
+    <div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>
+  </div>
 </body>
+
+<script src="/web/js/user.js" type="text/javascript"></script>
 <script src="/web/js/official.js" type="text/javascript"></script>
 <script src="/web/js/script.js" type="text/javascript"></script>
+<script src="/web/js/pages.js" type="text/javascript"></script>
+
 
 </html>
